@@ -1,0 +1,36 @@
+# Plataforma de Diagnóstico de Habilidades Blandas
+
+La Plataforma de Diagnóstico es una aplicación desarrollada en Python utilizando el framework Django (v4.2.1). Esta herramienta está diseñada para detectar deficiencias en habilidades blandas a través de diversas funcionalidades y características.
+
+Requisitos Previos
+
+- Django 4.2.1
+- python-dateutil 2.8.2
+- Otros requisitos están detallados en el archivo `requirements.txt`
+
+## Configuración del Entorno
+
+1. Clonar o descargar el repositorio
+git clone https://github.com/jrolas10/HABILIDADES-BLANDAS.git
+2. Realiza las migraciones de la base de datos
+La base de datos necesaria ya está incluida en el proyecto. Realiza las migraciones para ponerla en funcionamiento.
+3. Cambiar a false el debug para empezar a ejecutar cambios en el codigo
+
+
+Ejecución del Proyecto
+
+Para ejecutar el proyecto, utiliza el siguiente comando:
+python manage.py runserver
+
+Autenticación del Panel de Django
+Accede al panel de administración de Django mediante http://127.0.0.1:8000/admin/ con las siguientes credenciales:
+
+Usuario: rolas
+Contraseña: rolas
+
+Visualización de Gráficas
+Para ver las gráficas, accede a http://127.0.0.1:8000/base-graficas/. La autenticación ha sido desactivada para facilitar el acceso.
+
+
+En caso de subirlo a un servidor gratuito considerar que tiene muchas limitaciones pagina web de ayuda para este proceso
+https://molanco.com/es/blog/despliegue-de-django-en-pythonanywhere
