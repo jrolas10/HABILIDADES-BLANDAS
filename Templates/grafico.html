@@ -1,0 +1,243 @@
+{% extends 'base_graficas.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gráfico por encuestado</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        /* Estilos para el loader */
+        .loader-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+        }
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        /* Estilos para el resto de la página */
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .graficos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .grafico {
+            width: calc(50% - 10px);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .grafico img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* Estilos responsivos */
+        @media screen and (max-width: 600px) {
+            .grafico {
+                width: 100%;
+            }
+        }
+        /* Estilos para el modal de pantalla completa */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+        }
+        .close {
+            color: #fff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Estilos para centrar la imagen del gráfico */
+    .graficocentrado h3 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .graficocentrado button {
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Estilos para hacer el gráfico general responsivo */
+    .graficocentrado img {
+        max-width: 100%; /* La imagen no será más grande que su contenedor */
+        height: auto; /* Mantener la proporción de la imagen */
+    }
+    </style>
+</head>
+
+
+<body>
+    <!-- Contenido HTML -->
+    <h1>Seleccionar Encuestado</h1>
+    <form id="form_encuestado" method="post" action="{% url 'mostrar_graficos' %}">
+        {% csrf_token %}
+        <select id="encuestado" name="encuestado">
+            <option value="">Seleccione un encuestado...</option>
+            {% for encuestado in encuestados %}
+                <option value="{{ encuestado.id }}">{{ encuestado.nombre }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Mostrar Gráficos</button>
+    </form>
+
+
+    <div class="container">
+        <!-- Detalles del encuestado en tabla -->
+        <h2>Detalles del Encuestado</h2>
+        <table>
+            {% for key, value in detalles_encuestado.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+
+<!-- Contenido HTML existente -->
+
+        <div class="graficocentrado">
+            <h3>Gráfico General</h3>
+            {% if grafico_general %}
+                <img src="data:image/png;base64,{{ grafico_general }}" alt="Gráfico General">
+            {% else %}
+                <p>No hay gráfico disponible.</p>
+            {% endif %}
+            <button onclick="mostrarGraficasPorCategoria()">Mostrar Gráficos por Categoría</button>
+        </div>
+
+
+        <!-- Gráficos generados para cada categoría -->
+        <div class="graficos-container" style="display: none;">
+            {% for categoria, grafico_base64 in graficos_base64.items %}
+                <div class="grafico">
+                    <h3>{{ categoria }}</h3>
+                    {% if grafico_base64 %}
+                        <img src="data:image/png;base64,{{ grafico_base64 }}" alt="{{ categoria }}">
+                    {% else %}
+                        <p>No hay gráfico disponible para {{ categoria }}.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Resto del contenido HTML -->
+
+    <!-- Loader -->
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
+    <!-- Modal para mostrar la imagen a pantalla completa -->
+    <div id="modal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Función para mostrar la imagen a pantalla completa
+            $('.grafico').on('click', 'img', function() {
+                var modal = $('#modal');
+                modal.css('display', 'block');
+                $('#modal-img').attr('src', $(this).attr('src'));
+                $('.close').click(function() {
+                    modal.css('display', 'none');
+                });
+            });
+
+            $('#encuestado').change(function() {
+                $('#loader').show();
+                $('#grafico').hide().empty().append('<p>Cargando gráficos...</p>');
+                $('#form_encuestado').submit();
+            });
+        });
+    </script>
+
+<script>
+    function mostrarGraficasPorCategoria() {
+        // Mostrar las gráficas por categoría
+        $('.graficos-container').css('display', 'flex');
+    }
+</script>
+
+
+
+</body>
+</html>
+{% endblock %}

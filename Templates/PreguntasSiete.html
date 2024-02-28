@@ -1,0 +1,52 @@
+{% extends 'index.html' %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'estilos.css' %}">
+    <script src="{% static 'validacion.js' %}"></script>
+
+    <div class="container-fluid mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h2 class="text-left mb-4">TRABAJO EN EQUIPO</h2>
+                        <h5 class="text-left mb-2">En esta sección, evaluaremos tu capacidad para colaborar, comunicarte y trabajar eficientemente en equipo. Las habilidades de trabajo en equipo son cruciales en entornos laborales y sociales. Esta evaluación busca comprender cómo te relacionas con otros, cómo contribuyes a un ambiente colaborativo, cómo resuelves conflictos y cómo coordinas esfuerzos para alcanzar metas en conjunto.</h5>
+                        <h2 class="text-left mb-4"> </h2>
+                        <div class="table-container">
+                            <form method="post" action="{% url 'procesar_respuestas_trabajo' %}" onsubmit="return validarRespuestas()">
+                                {% csrf_token %}
+                                <input type="hidden" name="encuestado_id" value="{{ encuestado_id }}">
+                                <table>
+                                    <thead>
+                                        <tr><th>Pregunta</th><th>Respuesta</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pregunta in preguntas %}
+                                            <tr class="pregunta">
+                                                <td>{{ pregunta.texto }}</td>
+                                                <td>
+                                                    {% for i in "12345" %}
+                                                        <div class="radio-group">
+                                                            <input type="radio" name="pregunta{{ pregunta.id }}" id="pregunta{{ pregunta.id }}_opcion{{ i }}" value="{{ i }}">
+                                                            <label class="{% cycle 'custom-label-light' 'custom-label-dark' 'custom-label-light' 'custom-label-dark' 'custom-label-light' %}" for="pregunta{{ pregunta.id }}_opcion{{ i }}">
+                                                                {% cycle 'Muy en desacuerdo' 'En desacuerdo' 'Ni acuerdo ni desacuerdo' 'De acuerdo' 'Muy de acuerdo' %}
+                                                            </label>
+                                                        </div>
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="text-left mt-4">
+                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                    <span id="validation-summary" class="validation-message" style="display: none;"></span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

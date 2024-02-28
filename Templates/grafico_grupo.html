@@ -1,0 +1,283 @@
+{% extends 'base_graficas.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gráficos del Grupo</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        /* Estilos para el loader */
+        .loader-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+        }
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        /* Estilos para el resto de la página */
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .graficos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .grafico {
+            width: calc(50% - 10px);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .grafico img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* Estilos responsivos */
+        @media screen and (max-width: 600px) {
+            .grafico {
+                width: 100%;
+            }
+        }
+        /* Estilos para el modal de pantalla completa */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+        }
+        .close {
+            color: #fff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Estilos para centrar la imagen del gráfico */
+    .graficocentrado h3 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .graficocentrado button {
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Estilos para hacer el gráfico general responsivo */
+    .graficocentrado img {
+        max-width: 100%; /* La imagen no será más grande que su contenedor */
+        height: auto; /* Mantener la proporción de la imagen */
+    }
+
+    .grafico img {
+            width: 100%;
+            max-height: 400px; /* Ajusta la altura máxima de los gráficos */
+            object-fit: contain; /* Mantiene la relación de aspecto */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .page-break {
+    page-break-before: always; /* Hace que inicie una nueva página antes de esta división */
+    clear: both; /* Limpia los flotadores */
+}
+/* Estilos para hacer el gráfico general responsivo */
+.container img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+    </style>
+    
+</head>
+<body>
+    <!-- Contenido HTML -->
+    <h1>Seleccionar Grupo</h1>
+    <form id="form_grupo" method="post" action="{% url 'mostrar_graficos_grupo' %}">
+        {% csrf_token %}
+        <select id="grupo" name="grupo">
+            <option value="">Seleccione un grupo...</option>
+            {% for grupo in grupos %}
+                <option value="{{ grupo.id }}">{{ grupo.nombre }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="container">
+        <table>
+            <tr>
+                <th>Nombre del Grupo</th>
+                <th>Total de Encuestados</th>
+            </tr>
+            {% if encuestados_grupo %}
+                <tr>
+                    <td>{{ detalles_grupo.nombre }}</td>
+                    <td>{{ encuestados_grupo.count }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">No hay datos para mostrar.</td>
+                </tr>
+            {% endif %}
+        </table>
+
+
+        {% if encuestados_grupo %}
+            <h2>Detalles del Grupo</h2>
+
+            <h2>Gráfico General del Grupo</h2>
+            {% if grafico_general_grupo %}
+                <img src="data:image/png;base64,{{ grafico_general_grupo }}" alt="Gráfico General del Grupo">
+            {% else %}
+                <p>No hay gráfico general disponible para mostrar.</p>
+            {% endif %}
+            <div class="page-break"></div>
+
+            <div class="graficos-container">
+                {% for categoria, grafico_categoria in graficos_por_categoria_grupo.items %}
+                    <div class="grafico">
+                        <h3>{{ categoria }}</h3>
+                        {% if grafico_categoria %}
+                            <img src="data:image/png;base64,{{ grafico_categoria }}" alt="{{ categoria }}">
+                            
+                        {% else %}
+                            <p>No hay gráfico disponible para {{ categoria }}.</p>
+                        {% endif %}
+
+                        {% if forloop.counter|divisibleby:6 %}
+                            <div class="page-break"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <button id="generate-pdf">Generar PDF</button>
+        {% else %}
+            <p>No hay datos para mostrar.</p>
+        {% endif %}
+        
+        
+    </div>
+
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
+    <div id="modal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#grupo').change(function() {
+                $('#loader').css('display', 'block');
+                $('#form_grupo').submit();
+            });
+
+            $('#generate-pdf').on('click', function() {
+                        // Desactivar las reglas de responsividad
+
+                const element = document.querySelector('.container');
+                const options = {
+                    margin: 10,
+                    filename: 'grafico_grupo.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2, logging: true, scrollX: 0, scrollY: 0 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf()
+                    .from(element)
+                    .set(options)
+                    .toPdf()
+                    .get('pdf')
+                    .then(function(pdf) {
+                        $('#loader').css('display', 'none');
+                        pdf.save();
+                    });
+            });
+
+            $(window).on('load', function() {
+                $('#loader').css('display', 'none');
+            });
+        });
+    </script>
+    
+</body>
+</html>
+{% endblock %}

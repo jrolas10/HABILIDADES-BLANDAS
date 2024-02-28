@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Aplicación</title>
+    <!-- Enlaces a recursos externos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilos para el navbar de imágenes */
+        .navbar-images {
+            background-color: #fdfdfd;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px; /* Espacio inferior para separar del contenido principal */
+        }
+
+        .imagen-logo {
+            max-width: 80px;
+            height: auto;
+        }
+
+        /* Estilos para el sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: sticky; /* sticky en lugar de fixed */
+            top: 0;
+            background-color: #79acdf;
+            padding-top: 80px;
+            overflow-y: auto;
+            transition: width 0.5s;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para el contenido principal */
+        .main-content {
+            display: flex; /* Contenedor principal como flexbox */
+        }
+
+        .content-area {
+            flex-grow: 1; /* El contenido principal ocupa todo el espacio restante */
+            padding-top: 50px;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Enlaces del sidebar -->
+            <a href="{% url 'mostrar_graficos' %}">GRAFICOS POR ENCUESTADO</a>
+            <a href="{% url 'mostrar_graficos_grupo' %}">GRAFICOS POR GRUPO</a>
+            <a href="{% url 'admin:index' %}" target="_blank">Panel de Admin Django</a>
+            <!-- Agrega otros enlaces del sidebar según necesites -->
+        </div>
+
+        <!-- Contenedor para el navbar de imágenes -->
+        <div class="content-area">
+            <!-- Navbar de imágenes -->
+            <div class="navbar-images">
+                <img src="/static/images/logoeducacionsep.png" alt="Logo Educación SEP" class="imagen-logo">
+                <img src="/static/images/logotecnm.png" alt="Logo TECNM" class="imagen-logo">
+                <img src="/static/images/logoitt.png" alt="Logo ITT" class="imagen-logo">
+            </div>
+
+            <!-- Contenido principal -->
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Otros elementos HTML -->
+</body>
+
+</html>

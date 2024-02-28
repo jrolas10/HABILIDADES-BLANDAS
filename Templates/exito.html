@@ -1,0 +1,68 @@
+{% extends 'index.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Éxito!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .success-icon {
+            font-size: 50px;
+            color: #00b300;
+            margin: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .containerr {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 0px;
+            box-shadow: 0 10 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div style="margin-top: 50px;">
+    <div class="containerr">
+        <div class="success-icon">&#10004;</div>
+        <h1>¡Éxito!</h1>
+        <p>Tu formulario ha sido enviado correctamente.</p>
+        <ul>
+            <li><a href="{% url 'mostrar_graficos_personal' encuestado_id=encuestado.id %}">Ver resultados generales</a></li>
+        </ul>
+        <a href="{% url 'logout_view' %}" class="btn">Salir</a>
+        <a href="/" class="btn">Regresar al inicio</a>
+    </div>
+</body>
+</html>
+{% endblock %}
